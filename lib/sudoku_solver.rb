@@ -22,7 +22,7 @@ class SudokuSolver
   private
 
   def dfs(index)
-    return true if index >= 80
+    return true if index >= 81
 
     row = index / 9
     col =  index % 9
