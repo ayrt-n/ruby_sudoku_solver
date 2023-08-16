@@ -17,6 +17,8 @@ class SudokuBoard
   def guess(row, col, value)
     return false unless @initial_board[row][col].zero?
 
+    remove_guess(row, col) unless @board[row][col].zero?
+
     @board[row][col] = value
     @board_properties[:row][row][value] = true
     @board_properties[:col][col][value] = true
