@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'sudoku_solver'
 
 describe SudokuSolver do
