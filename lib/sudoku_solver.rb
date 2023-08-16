@@ -11,7 +11,7 @@ class SudokuSolver
     @solution_properties = create_board_properties_hash
   end
 
-  # Attenpt to solve board using backtracking/dfs and return 2d array of solution
+  # Attempt to solve board using backtracking/dfs and return 2d array of solution
   def backtrack
     dfs(0)
     solution
