@@ -5,8 +5,11 @@ class SudokuBoard
   attr_reader :board, :board_properties
 
   def initialize(board)
+    # Create board instance variable and board properties hash
     @board = board
     @board_properties = create_board_properties_hash
+
+    # Create deep copy of initial board to keep track of original values
     @initial_board = Marshal.load(Marshal.dump(board))
   end
 
@@ -42,6 +45,7 @@ class SudokuBoard
     true
   end
 
+  # Check if cell is empty and return bool
   def empty_cell?(row, col)
     board[row][col].zero?
   end
