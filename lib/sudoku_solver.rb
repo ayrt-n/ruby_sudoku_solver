@@ -11,10 +11,9 @@ class SudokuSolver
     @sudoku = SudokuBoard.new(board)
   end
 
-  # Attempt to solve board using backtracking/dfs and return 2d array of solution
+  # Attempt to solve board using backtracking/dfs and return bool if successful and (un)solved board
   def backtrack
-    dfs(0)
-    sudoku.board
+    [dfs(0), sudoku.board]
   end
 
   private
