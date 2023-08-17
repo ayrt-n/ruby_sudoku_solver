@@ -12,7 +12,7 @@ class SudokuSolver
   end
 
   # Attempt to solve board using backtracking/dfs and return bool if successful and (un)solved board
-  def backtrack
+  def backtrack_solve
     [dfs(0), sudoku.board]
   end
 

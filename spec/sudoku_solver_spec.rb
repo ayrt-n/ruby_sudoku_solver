@@ -3,7 +3,7 @@
 require 'sudoku_solver'
 
 describe SudokuSolver do
-  describe '#backtrack' do
+  describe '#backtrack_solve' do
     context 'when board is solvable' do
       it 'returns true and the sudoku board solved (easy)' do
         board = [
@@ -30,7 +30,7 @@ describe SudokuSolver do
         ]
 
         solver = SudokuSolver.new(board)
-        expect(solver.backtrack).to eq([true, solution])
+        expect(solver.backtrack_solve).to eq([true, solution])
       end
 
       it 'returns true and the sudoku board solved (medium)' do
@@ -58,7 +58,7 @@ describe SudokuSolver do
         ]
 
         solver = SudokuSolver.new(board)
-        expect(solver.backtrack).to eq([true, solution])
+        expect(solver.backtrack_solve).to eq([true, solution])
       end
 
       it 'returns true and the sudoku board solved (hard)' do
@@ -86,7 +86,7 @@ describe SudokuSolver do
         ]
 
         solver = SudokuSolver.new(board)
-        expect(solver.backtrack).to eq([true, solution])
+        expect(solver.backtrack_solve).to eq([true, solution])
       end
     end
 
@@ -105,7 +105,7 @@ describe SudokuSolver do
         ]
 
         solver = SudokuSolver.new(board)
-        expect(solver.backtrack).to eq([false, board])
+        expect(solver.backtrack_solve).to eq([false, board])
       end
     end
   end
