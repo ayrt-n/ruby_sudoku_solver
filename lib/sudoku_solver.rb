@@ -68,10 +68,10 @@ class SudokuSolver
 
   def propogate_constraint(constraints, row, col, constraint)
     # Propogate constraint across row
-    constraints[row].each_index { |c| constraints[row][c] -= constraint }
+    9.times { |c| constraints[row][c] -= constraint }
 
     # Propogate constraint across column
-    constraints.each_index { |r| constraints[r][col] -= constraint }
+    9.times { |r| constraints[r][col] -= constraint }
 
     # Propogate constraint across box
     box_row_start = (row / 3) * 3
@@ -90,25 +90,31 @@ class SudokuSolver
   end
 
   def propogate_row_constraints(constraints)
-    constraints.each do |row|
-      sets = row.group_by { |constraint| constraint }
+    9.times do |row|
+      sets = Hash.new { |h, k| h[k] = [] }
+      9.times { |col| sets[constraints[row][col]] << constraints[row][col] }
+
       sets.each do |constraint, group|
         next if constraint.size < 2 || constraint.size > 4 || constraint.size != group.size
 
-        row.map! { |cons| cons == constraint ? cons : cons - constraint }
+        9.times do |col|
+          next if constraints[row][col] == constraint
+
+          constraints[row][col] -= constraint
+        end
       end
     end
   end
 
   def propogate_col_constraints(constraints)
-    constraints[0].each_index do |col|
+    9.times do |col|
       sets = Hash.new { |h, k| h[k] = [] }
-      constraints.each_index { |row| sets[constraints[row][col]] << constraints[row][col] }
+      9.times { |row| sets[constraints[row][col]] << constraints[row][col] }
 
       sets.each do |constraint, group|
-        next if constraint.size < 2 && constraint.size > 4 || constraint.size != group.size
+        next if constraint.size < 2 || constraint.size > 4 || constraint.size != group.size
 
-        constraints.each_index do |row|
+        9.times do |row|
           next if constraints[row][col] == constraint
 
           constraints[row][col] -= constraint
@@ -128,7 +134,7 @@ class SudokuSolver
             sets[constraints[row][col]] << constraints[row][col]
 
             sets.each do |constraint, group|
-              next if constraint.size < 2 && constraint.size > 4 || constraint.size != group.size
+              next if constraint.size < 2 || constraint.size > 4 || constraint.size != group.size
 
               rows.each do |r|
                 cols.each do |c|
