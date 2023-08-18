@@ -18,23 +18,28 @@ class SudokuSolver
   end
 
   def constraint_solve
-    solved = 0
-    constraints = Array.new(9) { Array.new(9) { Set.new((1..9).to_a) } }
+    constraints = sudoku.board.map do |row|
+      row.map { |value| value.zero? ? Set.new((1..9)) : Set.new([value]) }
+    end
 
-    # while progress_made
-      sudoku.board.each_index do |r|
-        sudoku.board[r].each_with_index do |value, c|
-          if value.zero? && !constraints[r][c].empty?
-            constraints[r][c] = Set.new([])
-            solved += 1 + propogate_constraints(constraints, r, c, value)
-          else
-            # propogate_sets(constraints, r, c)
-          end
+    progress = true
+    while progress
+      progress = false
+
+      constraints.each_index do |r|
+        constraints[r].each_with_index do |constraint, c|
+          next unless constraint.size == 1
+
+          progress = true
+          sudoku.guess(r, c, constraint.take(1)[0])
+          propogate_constraint(constraints, r, c, constraint)
         end
       end
-    # end
 
-    solved
+      propogate_sets(constraints)
+    end
+
+    [true, sudoku.board]
   end
 
   private
@@ -61,62 +66,81 @@ class SudokuSolver
     false
   end
 
-  def propogate_constraints(matrix, row, col, value)
-    solved = 0
-
+  def propogate_constraint(constraints, row, col, constraint)
     # Propogate constraint across row
-    matrix[row].each_index do |c|
-      next unless matrix[row][c].size > 1
-
-      matrix[row][c].delete(value)
-      if matrix[row][c].size == 1
-        sudoku.guess(row, c, matrix[row][c].take(1)[0])
-        solved += 1
-      end
-    end
+    constraints[row].each_index { |c| constraints[row][c] -= constraint }
 
     # Propogate constraint across column
-    matrix.each_index do |r|
-      next unless matrix[r][col].size > 1
-
-      matrix[r][col].delete(value)
-      if matrix[r][col].size == 1
-        sudoku.guess(r,col, matrix[r][col].take(1)[0])
-        solved += 1
-      end
-    end
+    constraints.each_index { |r| constraints[r][col] -= constraint }
 
     # Propogate constraint across box
     box_row_start = (row / 3) * 3
     box_col_start = (col / 3) * 3
     (box_row_start...box_row_start + 3).each do |r|
       (box_col_start...box_col_start + 3).each do |c|
-        next unless matrix[r][c].size > 1
+        constraints[r][c] -= constraint
+      end
+    end
+  end
 
-        matrix[r][c].delete(value)
-        if matrix[r][c].size == 1
-          sudoku.guess(r, c, matrix[r][c].take(1)[0])
-          solved += 1
+  def propogate_sets(constraints)
+    propogate_row_constraints(constraints)
+    propogate_col_constraints(constraints)
+    propogate_box_constraints(constraints)
+  end
+
+  def propogate_row_constraints(constraints)
+    constraints.each do |row|
+      sets = row.group_by { |constraint| constraint }
+      sets.each do |constraint, group|
+        next if constraint.size < 2 || constraint.size > 4 || constraint.size != group.size
+
+        row.map! { |cons| cons == constraint ? cons : cons - constraint }
+      end
+    end
+  end
+
+  def propogate_col_constraints(constraints)
+    constraints[0].each_index do |col|
+      sets = Hash.new { |h, k| h[k] = [] }
+      constraints.each_index { |row| sets[constraints[row][col]] << constraints[row][col] }
+
+      sets.each do |constraint, group|
+        next if constraint.size < 2 && constraint.size > 4 || constraint.size != group.size
+
+        constraints.each_index do |row|
+          next if constraints[row][col] == constraint
+
+          constraints[row][col] -= constraint
         end
       end
     end
+  end
 
-    solved
+  def propogate_box_constraints(constraints)
+    box_ranges = [(0..2), (3..5), (6..8)]
+
+    box_ranges.each do |rows|
+      box_ranges.each do |cols|
+        sets = Hash.new { |h, k| h[k] = [] }
+        rows.each do |row|
+          cols.each do |col|
+            sets[constraints[row][col]] << constraints[row][col]
+
+            sets.each do |constraint, group|
+              next if constraint.size < 2 && constraint.size > 4 || constraint.size != group.size
+
+              rows.each do |r|
+                cols.each do |c|
+                  next if constraints[r][c] == constraint
+
+                  constraints[r][c] -= constraint
+                end
+              end
+            end
+          end
+        end
+      end
+    end
   end
 end
-
-board = [
-  [5, 3, 0, 0, 7, 0, 0, 0, 0],
-  [6, 0, 0, 1, 9, 5, 0, 0, 0],
-  [0, 9, 8, 0, 0, 0, 0, 6, 0],
-  [8, 0, 0, 0, 6, 0, 0, 0, 3],
-  [4, 0, 0, 8, 0, 3, 0, 0, 1],
-  [7, 0, 0, 0, 2, 0, 0, 0, 6],
-  [0, 6, 0, 0, 0, 0, 2, 8, 0],
-  [0, 0, 0, 4, 1, 9, 0, 0, 5],
-  [0, 0, 0, 0, 8, 0, 0, 7, 9]
-]
-
-solver = SudokuSolver.new(board)
-solver.constraint_solve
-solver.sudoku.board.each { |r| p r }
