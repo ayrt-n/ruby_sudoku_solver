@@ -32,11 +32,11 @@ class SudokuSolver
 
           progress = true
           sudoku.guess(r, c, constraint.take(1)[0])
-          propogate_constraint(constraints, r, c, constraint)
+          propagate_constraint(constraints, r, c, constraint)
         end
       end
 
-      propogate_sets(constraints)
+      propagate_sets(constraints)
     end
 
     [true, sudoku.board]
@@ -66,14 +66,14 @@ class SudokuSolver
     false
   end
 
-  def propogate_constraint(constraints, row, col, constraint)
-    # Propogate constraint across row
+  def propagate_constraint(constraints, row, col, constraint)
+    # propagate constraint across row
     9.times { |c| constraints[row][c] -= constraint }
 
-    # Propogate constraint across column
+    # propagate constraint across column
     9.times { |r| constraints[r][col] -= constraint }
 
-    # Propogate constraint across box
+    # propagate constraint across box
     box_row_start = (row / 3) * 3
     box_col_start = (col / 3) * 3
     (box_row_start...box_row_start + 3).each do |r|
@@ -83,13 +83,13 @@ class SudokuSolver
     end
   end
 
-  def propogate_sets(constraints)
-    propogate_row_constraints(constraints)
-    propogate_col_constraints(constraints)
-    propogate_box_constraints(constraints)
+  def propagate_sets(constraints)
+    propagate_row_constraints(constraints)
+    propagate_col_constraints(constraints)
+    propagate_box_constraints(constraints)
   end
 
-  def propogate_row_constraints(constraints)
+  def propagate_row_constraints(constraints)
     9.times do |row|
       sets = Hash.new { |h, k| h[k] = [] }
       9.times { |col| sets[constraints[row][col]] << constraints[row][col] }
@@ -106,7 +106,7 @@ class SudokuSolver
     end
   end
 
-  def propogate_col_constraints(constraints)
+  def propagate_col_constraints(constraints)
     9.times do |col|
       sets = Hash.new { |h, k| h[k] = [] }
       9.times { |row| sets[constraints[row][col]] << constraints[row][col] }
@@ -123,7 +123,7 @@ class SudokuSolver
     end
   end
 
-  def propogate_box_constraints(constraints)
+  def propagate_box_constraints(constraints)
     box_ranges = [(0..2), (3..5), (6..8)]
 
     box_ranges.each do |rows|
