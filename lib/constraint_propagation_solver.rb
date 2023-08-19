@@ -2,33 +2,32 @@
 
 # Sudoku solving algorithm implemented using constraint propagation and backtracking
 class ConstraintPropagationSolver
-  def solve(sudoku)
-    constraints = sudoku.board.map do |row|
+  # Build constraints matrix using initial sudoku board
+  def build_constraints_matrix(sudoku)
+    sudoku.board.map do |row|
       row.map { |value| value.zero? ? Set.new((1..9)) : Set.new([value]) }
     end
+  end
 
-    continue = true
-    while continue
-      continue = false
+  def solve(sudoku)
+    constraints = build_constraints_matrix(sudoku)
 
-      constraints.each_index do |r|
-        constraints[r].each_with_index do |constraint, c|
-          next unless constraint.size == 1
-
-          continue = true
-          sudoku.guess(r, c, constraint.take(1)[0])
-          propagate_constraint(constraints, r, c, constraint)
-        end
-      end
-
-      continue ||= propagate_sets(constraints)
+    # Reduce constraints / fill in board using constraint propagation until no more progress made
+    progress = [true]
+    while progress.any?
+      progress = [fill_in_singles(sudoku, constraints),
+                  propagate_row_constraints(constraints),
+                  propagate_col_constraints(constraints),
+                  propagate_box_constraints(constraints)]
     end
 
+    # Finish solving algorithm using DFS, return bool if solved and the board
     [dfs(sudoku, constraints, 0), sudoku.board]
   end
 
   private
 
+  # Attempt to solve sudoku using DFS and constraints matrix, return bool if solved
   def dfs(sudoku, constraints, index)
     return true if index >= 81
 
@@ -51,12 +50,31 @@ class ConstraintPropagationSolver
     false
   end
 
-  def propagate_constraint(constraints, row, col, constraint)
-    # Propagate constraint across row
-    9.times { |c| constraints[row][c] -= constraint }
+  # Iterates through constraints matrix and fills in sudoku board if position found with only one possible value
+  # After filling in the board, propagate constraint by removing this value from all other cells in row/col/box
+  def fill_in_singles(sudoku, constraints)
+    # Flag if single has been filled in
+    single_filled = false
 
-    # Propagate constraint across column
-    9.times { |r| constraints[r][col] -= constraint }
+    constraints.each_index do |r|
+      constraints[r].each_with_index do |constraint, c|
+        next unless constraint.size == 1
+
+        single_filled = true
+        sudoku.guess(r, c, constraint.take(1)[0])
+        propagate_constraint(constraints, r, c, constraint)
+      end
+    end
+
+    single_filled
+  end
+
+  def propagate_constraint(constraints, row, col, constraint)
+    # Propagate constraint across row/col
+    9.times do |i|
+      constraints[row][i] -= constraint
+      constraints[i][col] -= constraint
+    end
 
     # Propagate constraint across box
     box_row_start = (row / 3) * 3
@@ -66,12 +84,6 @@ class ConstraintPropagationSolver
         constraints[r][c] -= constraint
       end
     end
-  end
-
-  def propagate_sets(constraints)
-    propagate_row_constraints(constraints)   ||
-      propagate_col_constraints(constraints) ||
-      propagate_box_constraints(constraints)
   end
 
   def propagate_row_constraints(constraints)
