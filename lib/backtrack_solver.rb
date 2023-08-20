@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# Sudoku solving algorithm implemented using backtracking
+# Sudoku Solving Algorithm Implemented with Backtracking
+# Initialized with sudoku board and then able to solve (if possible) using #solve
 class BacktrackSolver
   attr_reader :sudoku
 
