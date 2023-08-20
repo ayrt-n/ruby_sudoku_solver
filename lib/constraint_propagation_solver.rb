@@ -85,8 +85,8 @@ class ConstraintPropagationSolver
     changes_made || false
   end
 
+  # Find naked sets (doubles, triples, and quads) in row and propagate constraint 
   def propagate_row_constraints
-    # Flag if constraints were able to be reduced
     changes_made = false
 
     9.times do |row|
@@ -103,8 +103,8 @@ class ConstraintPropagationSolver
     changes_made
   end
 
+  # Find naked sets (doubles, triples, and quads) in col and propagate constraint
   def propagate_col_constraints
-    # Flag if constraints were able to be reduced
     changes_made = false
 
     9.times do |col|
@@ -121,6 +121,7 @@ class ConstraintPropagationSolver
     changes_made
   end
 
+  # Find naked sets (doubles, triples, and quads) in box and propagate constraint
   def propagate_box_constraints
     changes_made = false
     box_ranges = [(0..2), (3..5), (6..8)]
@@ -145,12 +146,14 @@ class ConstraintPropagationSolver
     changes_made
   end
 
+  # Propagate a single constraint across row, col, and box
   def propagate_single_constraint(constraint, row, col)
     propagate_row_constraint(constraint, row)
     propagate_col_constraint(constraint, col)
     propagate_box_constraint(constraint, row, col)
   end
 
+  # For a given constraint, iterate through a box and propagate that constraint across the box to other values
   def propagate_box_constraint(constraint, row, col)
     changes_made = false
 
@@ -168,6 +171,7 @@ class ConstraintPropagationSolver
     changes_made
   end
 
+  # For a given constraint, iterate through row and propagate that constraint across the row to other values
   def propagate_row_constraint(constraint, row)
     changes_made = false
 
@@ -181,6 +185,7 @@ class ConstraintPropagationSolver
     changes_made
   end
 
+  # For a given constraint, iterate through col and propagate that constraint across the col to other values
   def propagate_col_constraint(constraint, col)
     changes_made = false
 
