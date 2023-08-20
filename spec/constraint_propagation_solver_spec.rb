@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'sudoku_solver'
+require 'sudoku_board'
 require 'constraint_propagation_solver'
 
 describe ConstraintPropagationSolver do
@@ -30,7 +30,7 @@ describe ConstraintPropagationSolver do
           [3, 4, 5, 2, 8, 6, 1, 7, 9]
         ]
 
-        solver = SudokuSolver.new(board, ConstraintPropagationSolver.new)
+        solver = ConstraintPropagationSolver.new(SudokuBoard.new(board))
         expect(solver.solve).to eq([true, solution])
       end
 
@@ -58,7 +58,7 @@ describe ConstraintPropagationSolver do
           [8, 3, 5, 2, 7, 6, 4, 1, 9]
         ]
 
-        solver = SudokuSolver.new(board, ConstraintPropagationSolver.new)
+        solver = ConstraintPropagationSolver.new(SudokuBoard.new(board))
         expect(solver.solve).to eq([true, solution])
       end
 
@@ -86,7 +86,7 @@ describe ConstraintPropagationSolver do
           [8, 6, 1, 4, 7, 9, 5, 3, 2]
         ]
 
-        solver = SudokuSolver.new(board, ConstraintPropagationSolver.new)
+        solver = ConstraintPropagationSolver.new(SudokuBoard.new(board))
         expect(solver.solve).to eq([true, solution])
       end
     end
@@ -105,7 +105,7 @@ describe ConstraintPropagationSolver do
           [8, 6, 1, 4, 7, 9, 5, 3, 2]
         ]
 
-        solver = SudokuSolver.new(board, ConstraintPropagationSolver.new)
+        solver = ConstraintPropagationSolver.new(SudokuBoard.new(board))
         expect(solver.solve).to eq([false, board])
       end
     end
