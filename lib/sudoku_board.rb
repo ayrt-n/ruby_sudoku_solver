@@ -52,6 +52,10 @@ class SudokuBoard
     board[row][col].zero?
   end
 
+  def reset
+    @board = Marshal.load(Marshal.dump(@initial_board))
+  end
+
   private
 
   # Create and return hash containing properties of board for easy validation (row, col, and box values)
