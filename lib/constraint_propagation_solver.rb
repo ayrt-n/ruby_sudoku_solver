@@ -23,7 +23,11 @@ class ConstraintPropagationSolver
                   propagate_box_constraints]
     end
 
-    [dfs(0), @sudoku.board]
+    if @sudoku.complete?
+      [true, @sudoku.board]
+    else
+      dfs(0) ? [true, @sudoku.board] : [false, @sudoku.initial_board]
+    end
   end
 
   private

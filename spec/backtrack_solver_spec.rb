@@ -104,9 +104,20 @@ describe BacktrackSolver do
           [5, 4, 7, 8, 3, 2, 1, 9, 6],
           [8, 6, 1, 4, 7, 9, 5, 3, 2]
         ]
+        solution = [
+          [6, 1, 5, 7, 2, 8, 3, 4, 9],
+          [3, 0, 9, 6, 4, 5, 7, 1, 8],
+          [7, 8, 4, 1, 9, 3, 6, 2, 5],
+          [1, 5, 9, 3, 8, 4, 2, 6, 7],
+          [4, 3, 6, 2, 5, 7, 9, 8, 1],
+          [2, 7, 8, 9, 6, 1, 4, 5, 3],
+          [9, 2, 3, 5, 1, 6, 8, 7, 4],
+          [5, 4, 7, 8, 3, 2, 1, 9, 6],
+          [8, 6, 1, 4, 7, 9, 5, 3, 2]
+        ]
 
         solver = BacktrackSolver.new(SudokuBoard.new(board))
-        expect(solver.solve).to eq([false, board])
+        expect(solver.solve).to eq([false, solution])
       end
     end
   end

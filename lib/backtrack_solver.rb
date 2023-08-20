@@ -9,8 +9,9 @@ class BacktrackSolver
     @sudoku = sudoku
   end
 
+  # Attempt to solve with DFS, return array with [is_solved, sudoku_board]
   def solve
-    [dfs(0), @sudoku.board]
+    dfs(0) ? [true, @sudoku.board] : [false, @sudoku.initial_board]
   end
 
   private
