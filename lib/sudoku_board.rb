@@ -2,7 +2,7 @@
 
 # Class representation of sudoku board
 class SudokuBoard
-  attr_reader :board, :board_properties
+  attr_reader :initial_board, :board, :board_properties
 
   def initialize(board)
     # Create board instance variable and board properties hash
@@ -38,7 +38,7 @@ class SudokuBoard
     true
   end
 
-  # Check if valid guess and return bool
+  # Return bool if guess is valid. In this case, valid means the value does not yet exist in the same row/col/box
   def valid_guess?(row, col, value)
     return false if @board_properties[:row][row][value] ||
                     @board_properties[:col][col][value] ||
@@ -47,11 +47,29 @@ class SudokuBoard
     true
   end
 
-  # Check if cell is empty and return bool
+  # Return bool if cell is empty
   def empty_cell?(row, col)
     board[row][col].zero?
   end
 
+  # Return bool if board is complete and valid
+  def complete?
+    validation = Hash.new { |h, k| h[k] = Array.new(9) { Array.new(10) } }
+
+    board.each_index do |r|
+      board[r].each_with_index do |value, c|
+        b = 3 * (r / 3) + (c / 3)
+        return false if value.zero? || validation[:row][r][value] ||
+                        validation[:col][c][value] || validation[:box][b][value]
+
+        validation[:row][r][value], validation[:col][c][value], validation[:box][b][value] = [true] * 3
+      end
+    end
+
+    true
+  end
+
+  # Reset board to original values
   def reset
     @board = Marshal.load(Marshal.dump(@initial_board))
   end
@@ -60,19 +78,17 @@ class SudokuBoard
 
   # Create and return hash containing properties of board for easy validation (row, col, and box values)
   def create_board_properties_hash
-    board_properties = Hash.new { |h, k| h[k] = Array.new(9) { Array.new(10) } }
+    properties = Hash.new { |h, k| h[k] = Array.new(9) { Array.new(10) } }
 
     board.each_index do |r|
       board[r].each_with_index do |value, c|
         next if value.zero?
 
         b = 3 * (r / 3) + (c / 3)
-        board_properties[:row][r][value] = true
-        board_properties[:col][c][value] = true
-        board_properties[:box][b][value] = true
+        properties[:row][r][value], properties[:col][c][value], properties[:box][b][value] = [true] * 3
       end
     end
 
-    board_properties
+    properties
   end
 end
